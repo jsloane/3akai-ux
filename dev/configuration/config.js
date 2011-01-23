@@ -41,7 +41,7 @@ sakai.config = {
         SEARCH_PEOPLE_URL: "search_people.html",
         SEARCH_GROUP_URL: "search_groups.html",
         SEARCH_SITES_URL: "search_sites.html",
-        TINY_MCE_CONTENT_CSS: "/dev/css/FSS/fss-base.css,/dev/css/sakai/sakai.core.2.css,/dev/css/sakai/sakai.base.css,/dev/css/sakai/sakai.editor.css,/dev/css/sakai/sakai.show.css",
+        TINY_MCE_CONTENT_CSS: "/dev/css/FSS/fss-base.css,/dev/css/sakai/sakai.base.css,/dev/css/sakai/sakai.editor.css,/dev/css/sakai/sakai.show.css",
         TINY_MCE_EDITOR_CSS: "/dev/css/sakai/tinymce_editor_styling.css",
         USER_DEFAULT_ICON_URL: "/dev/images/user_avatar_icon_48x48.png",
         USER_DEFAULT_UPLOAD_FOLDER: "/private/uploads",
@@ -613,6 +613,7 @@ sakai.config = {
             description: "POWERPOINT_DOCUMENT"
         },
         "application/vnd.oasis.opendocument.text": {
+            cssClass: "icon-doc-sprite",
             URL: "/dev/images/mimetypes/doc.png",
             description: "OPEN_OFFICE_DOCUMENT"
         },
@@ -682,6 +683,11 @@ sakai.config = {
             description: "VIDEO_FILE"
         },
         "video/mp4": {
+            cssClass: "icon-video-sprite",
+            URL: "/dev/images/mimetypes/video.png",
+            description: "VIDEO_FILE"
+        },
+        "video/quicktime":{
             cssClass: "icon-video-sprite",
             URL: "/dev/images/mimetypes/video.png",
             description: "VIDEO_FILE"
