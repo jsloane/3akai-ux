@@ -37,10 +37,11 @@
         </div>
 
         <!-- CONTENT -->
-        <div class="fl-container-flex header">
-            <div class="fl-fix fl-centered fixed-container">
-                <div class="decor">
-                </div>
+        <div class="fl-container-flex header s3d-header">
+            <div class="fl-fix fl-centered fixed-container s3d-fixed-container">
+                <div class="s3d-decor-left"><!-- --></div>
+                <div class="s3d-decor"></div>
+
                 <!-- TITLE BAR  -->
                 <div class="s3d-site-heading">
                     <h1>__MSG__WIDGET_ADMIN__</h1>
@@ -127,9 +128,7 @@
                         <div class="dialog_buttons">
                             {if i.enabled}
                                 <button class="s3d-button admin_widgets_button_disable" id="admin_widgets_disable_${i.id}"><span class="s3d-button-inner">__MSG__DISABLE_WIDGET__</span></button>
-                                <button class="s3d-button admin_widgets_button_enable" id="admin_widgets_enable_${i.id}" style="display:none;"><span class="s3d-button-inner">__MSG__ENABLE_WIDGET__</span></button>
                             {else}
-                                <button class="s3d-button admin_widgets_button_disable" id="admin_widgets_disable_${i.id}" style="display:none;"><span class="s3d-button-inner">__MSG__DISABLE_WIDGET__</span></button>
                                 <button class="s3d-button admin_widgets_button_enable" id="admin_widgets_enable_${i.id}"><span class="s3d-button-inner">__MSG__ENABLE_WIDGET__</span></button>
                             {/if}
                         </div>
@@ -159,9 +158,7 @@
                             <div class="dialog_buttons">
                             {if i.enabled}
                                 <button class="s3d-button admin_widgets_button_disable" id="admin_widgets_disable_${i.id}"><span class="s3d-button-inner">__MSG__DISABLE_WIDGET__</span></button>
-                                <button class="s3d-button admin_widgets_button_enable" id="admin_widgets_enable_${i.id}" style="display:none;"><span class="s3d-button-inner">__MSG__ENABLE_WIDGET__</span></button>
                             {else}
-                                <button class="s3d-button admin_widgets_button_disable" id="admin_widgets_disable_${i.id}" style="display:none;"><span class="s3d-button-inner">__MSG__DISABLE_WIDGET__</span></button>
                                 <button class="s3d-button admin_widgets_button_enable" id="admin_widgets_enable_${i.id}"><span class="s3d-button-inner">__MSG__ENABLE_WIDGET__</span></button>
                             {/if}
                             <button class="s3d-button admin_widgets_button_delete" id="admin_widgets_delete_${i.id}"><span class="s3d-button-inner">__MSG__DELETE_WIDGET__</span></button>

@@ -119,14 +119,11 @@ require(["jquery","sakai/sakai.api.core"], function($, sakai) {
          * @param {String} widgetId - the widget ID to disable
          */
         var disableWidget = function(widgetId){
-            var disableButtonId = adminWidgetsDisable + widgetId;
-            var enableButtonId = adminWidgetsEnable + widgetId;
 
             // ajax call to service
 
             // on success
-            $(disableButtonId).hide();
-            $(enableButtonId).show();
+            renderCurrentWidgets();
             $(adminWidgetsDisableDialog).jqmHide();
                     sakai.api.Util.notification.show($(adminWidgetsNofication).html(),
                                                      "&quot;" + widgetId + "&quot; " + $(adminWidgetsNoficationDisableSuccess).html(),
@@ -144,14 +141,11 @@ require(["jquery","sakai/sakai.api.core"], function($, sakai) {
          * @param {String} widgetId - the widget ID to enable
          */
         var enableWidget = function(widgetId){
-            var disableButtonId = adminWidgetsDisable + widgetId;
-            var enableButtonId = adminWidgetsEnable + widgetId;
 
             // ajax call to service
 
             // on success
-            $(enableButtonId).hide();
-            $(disableButtonId).show();
+            renderCurrentWidgets();
             $(adminWidgetsEnableDialog).jqmHide();
                     sakai.api.Util.notification.show($(adminWidgetsNofication).html(),
                                                      "&quot;" + widgetId + "&quot; " + $(adminWidgetsNoficationEnableSuccess).html(),
@@ -169,13 +163,12 @@ require(["jquery","sakai/sakai.api.core"], function($, sakai) {
          * @param {String} widgetId - the widget ID to delete
          */
         var deleteWidget = function(widgetId){
-            var widgetSection = adminWidgetsWidget + widgetId;
-
             // ajax call to service
 
             // on success
+            delete sakai.widgets[widgetId];
+            renderCurrentWidgets();
             $(adminWidgetsDeleteDialog).jqmHide();
-            $(widgetSection).hide();
             sakai.api.Util.notification.show($(adminWidgetsNofication).html(),
                                                      "&quot;" + widgetId + "&quot; " + $(adminWidgetsNoficationDeleteSuccess).html(),
                                                      sakai.api.Util.notification.type.INFORMATION);
@@ -188,7 +181,7 @@ require(["jquery","sakai/sakai.api.core"], function($, sakai) {
         };
 
         /**
-         * Positions the dialog box at the users scroll position
+         * Installs a widget from the supplied URL
          */
         var installFromUrl = function(){
             var widgetUrl = $(adminWidgetsInstallUrl).val();
@@ -201,6 +194,7 @@ require(["jquery","sakai/sakai.api.core"], function($, sakai) {
             var widgetId = "widgetId";
             $(adminWidgetsInstallUrl).removeAttr("disabled");
             $(adminWidgetsInstallUrlSubmit).removeAttr("disabled");
+            renderCurrentWidgets();
             sakai.api.Util.notification.show($(adminWidgetsNofication).html(),
                                                      "&quot;" + widgetId + "&quot; " + $(adminWidgetsNoficationInstallSuccess).html(),
                                                      sakai.api.Util.notification.type.INFORMATION);
