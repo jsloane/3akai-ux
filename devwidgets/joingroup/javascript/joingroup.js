@@ -140,7 +140,7 @@ require(["jquery", "sakai/sakai.api.core"], function($, sakai) {
                         if ($.isFunction(callback)){
                             callback(group);
                         }
-                    });
+                    }, true);
                 } else {
                     debug.error("Batch request to fetch group (id: " + id + ") data failed.");
                 }
