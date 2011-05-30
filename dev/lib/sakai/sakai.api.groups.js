@@ -29,7 +29,7 @@
  * @namespace
  * Group related convenience functions
  */
-define(["jquery", "/dev/configuration/config.js", "sakai/sakai.api.server", "sakai/sakai.api.util", "sakai/sakai.api.communication"], function($, sakai_conf, sakai_serv, sakai_util, sakai_comm){
+define(["jquery", "/dev/configuration/config.js", "sakai/sakai.api.server", "sakai/sakai.api.util"], function($, sakai_conf, sakai_serv, sakai_util){
     var sakaiGroupsAPI = {
         /**
          * Get the data for the specified group
@@ -607,11 +607,6 @@ define(["jquery", "/dev/configuration/config.js", "sakai/sakai.api.server", "sak
                         if ($.isFunction(callback)) {
                             callback(true);
                         }
-                        sakaiGroupsAPI.getMembers(groupID, false, function(success, members) {
-                            if (success){
-                                //sakai_comm.sendMessage(members.Manager.results, "test", "Request to join group", "test");
-                            }
-                        }, true);
                     },
                     error: function (xhr, textStatus, thrownError) {
                         debug.error("Could not process join request");
