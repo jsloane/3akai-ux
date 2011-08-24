@@ -181,6 +181,7 @@ require(["jquery", "sakai/sakai.api.core"], function($, sakai) {
                 messageList.push(msg);
             });
             var hardDelete = widgetData.box === "trash" ? true : false;
+            var deletedFrom = widgetData.box;
             sakai.api.Communication.deleteMessages(messageList, hardDelete, function(success, data) {
                 numJustDeleted = messageList.length;
                 var done = false;
@@ -190,7 +191,7 @@ require(["jquery", "sakai/sakai.api.core"], function($, sakai) {
                         done = true;
                     }
                 });
-            });
+            }, deletedFrom);
         });
 
         $inbox_select_unread.live("click", function(e) {
@@ -296,8 +297,9 @@ require(["jquery", "sakai/sakai.api.core"], function($, sakai) {
 
         var deleteMessage = function(e) {
             var mid = $(e.currentTarget).parents(".inbox_items_container").attr("id");
-            var msg = messages.results[mid];
+            var msg = [messages.results[mid]];
             var hardDelete = widgetData.box === "trash" ? true : false;
+            var deletedFrom = widgetData.box;
             sakai.api.Communication.deleteMessages(msg, hardDelete, function(success, data) {
                 if (!success) {
                     debug.error("deleting failed");
@@ -305,7 +307,7 @@ require(["jquery", "sakai/sakai.api.core"], function($, sakai) {
                 } else {
                     getMessages();
                 }
-            });
+            }, deletedFrom);
             if ($inbox_show_message.is(":visible")) {
                 $.bbq.removeState("message", "reply");
             } else {
@@ -405,7 +407,7 @@ require(["jquery", "sakai/sakai.api.core"], function($, sakai) {
         var focusReply = function() {
             var $replyBody = $("#comp-body", $rootel);
             // Only animate if the reply box is below the window's viewable area
-            if ($replyBody.offset().top > (window.innerHeight+200)) {
+            if ($replyBody.offset() && $replyBody.offset().top > (window.innerHeight+200)) {
                 $("html, body").animate({
                     scrollTop: $replyBody.offset().top
                 }, 350, "swing", function() {

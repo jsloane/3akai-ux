@@ -266,7 +266,7 @@ define(
             });
         },
 
-        deleteMessages : function(messages, hardDelete, callback) {
+        deleteMessages : function(messages, hardDelete, callback, deletedFrom) {
             var requests = [],
                 params = {},
                 unreads = [];
@@ -275,6 +275,9 @@ define(
                 params = {":operation": "delete"};
             } else {
                 params = {"sakai:messagebox": "trash"};
+                if (deletedFrom){
+                    params["sakai:deletedfrom"] = deletedFrom;
+                }
             }
             $.each(messages, function(i, val){
                 if (!val.read || val.read === "false") {
@@ -402,6 +405,7 @@ define(
                     newMsg.id = msg.id;
                     newMsg.read = msg["sakai:read"];
                     newMsg.path = msg["_path"];
+                    newMsg.deletedfrom = msg["sakai:deletedfrom"];
                     if (msg.previousMessage) {
                         newMsg.previousMessage = sakaiCommunicationsAPI.processMessages([msg.previousMessage]);
                         $.each(newMsg.previousMessage, function(i,val){
