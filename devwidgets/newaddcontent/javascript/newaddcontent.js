@@ -614,9 +614,20 @@ require(["jquery", "sakai/sakai.api.core", "jquery-plugins/jquery.fileupload", "
             xhReq.send(formData);
             if (xhReq.status == 201){
                 var data = $.parseJSON(xhReq.responseText);
-                documentObj = $.extend({}, data[documentObj["sakai:originaltitle"]].item, documentObj);
-                if (data[documentObj["sakai:originaltitle"]].type === "imscp") {
-                    setIMSCPContent(documentObj, data[documentObj["sakai:originaltitle"]].item);
+                var item = false;
+                if (data[documentObj["sakai:originaltitle"]]) {
+                    item = data[documentObj["sakai:originaltitle"]].item;
+                } else {
+                    for(var key in data) {
+                        if(data.hasOwnProperty(key)) {
+                            item = data[key].item;
+                            break;
+                        }
+                    }
+                }
+                documentObj = $.extend({}, item, documentObj);
+                if (item && documentObj.type === "imscp") {
+                    setIMSCPContent(documentObj, item);
                 } else {
                     setDataOnContent(documentObj);
                 }
