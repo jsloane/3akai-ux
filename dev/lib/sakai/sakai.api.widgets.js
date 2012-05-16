@@ -513,6 +513,15 @@ define(
                                         $("head").append(allSS[z]);
                                     }
                                 }
+
+                                for (var i = 0, j = requestedURLsResults.length; i < j; i++) {
+                                    // Current widget name
+                                    var widgetName = requestedURLsResults[i].url.split("/")[2];
+                                    if (window.sakai_global[widgetName]){
+                                        //informOnLoad(widgetName);
+                                        window.sakai_global[widgetName]();
+                                    }
+                                }
                             }
                         }, false);
                     }

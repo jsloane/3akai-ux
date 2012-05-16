@@ -136,7 +136,8 @@ require(
         "jquery-plugins/jquery.jcarousel.sakai-edit",
         "jquery-plugins/jquery.jeditable.sakai-edited",
         "jquery-plugins/jquery.tagcloud",
-        "jquery-plugins/jquery.infinitescroll-sakai"
+        "jquery-plugins/jquery.infinitescroll-sakai",
+        "sakai/sakai.widgets"
     ],
     function($, sakai) {
         require(['misc/domReady!'], function(doc) {
