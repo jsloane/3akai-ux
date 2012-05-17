@@ -83,7 +83,7 @@
     </target>
 
     <!-- Target: Concatenate widget CSS files and update HTML references -->
-    <target name="concatenate_widget_css" description="Concatenating widget CSS files">
+    <target name="concatenate_widget_css" depends="init" description="Concatenating widget CSS files">
 
         <!-- Concatenate widget CSS files -->
         <echo message="Concatenating widget CSS files..." />
@@ -96,7 +96,7 @@
         <echo message="Updating CSS References in widget HTML files..." />
 
         <!-- Insert Core Javascript reference for the HTML files to the combined Javascript file -->
-        <!--<replaceregexp match="(.*)/devwidgets/(.*).css(.*)" replace="\1${CSSPATH}${CSSCOMMONWIDGETFILE}\3">-->
+        <!--<replaceregexp match="(.*)/devwidgets/(.*).css(.*)" replace="\1/dev${CSSPATH}${CSSCOMMONWIDGETFILE}\3">-->
         <replaceregexp match="(.*)/devwidgets/(.*).css(.*)" replace="">
             <fileset dir="${TARGET_DIR_W}">
                 <patternset refid="html.widgetfiles"/>
@@ -335,7 +335,7 @@
     </target>
 
     <!-- Target: Release Builds-->
-    <target name="release" depends="init, create_target_folders, copy_optimized, permissions, formatting, unpackMathFonts, concatenate_widget_css, optimize, hash_files">
+    <target name="release" depends="init, create_target_folders, copy_optimized, permissions, formatting, unpackMathFonts, optimize, concatenate_widget_css, hash_files">
         <echo message="Sakai 3 UX Build: Build complete." />
     </target>
 
