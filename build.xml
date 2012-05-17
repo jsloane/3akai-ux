@@ -57,6 +57,20 @@
             <include name="**/javascript/*.js"/>
         </patternset>
 
+        <!-- Define a patternset for widget CSS files (from ${TARGET_DIR_W}) -->
+        <patternset id="css.widgetfiles">
+            <include name="**/css/*.css"/>
+        </patternset>
+
+        <!-- Define a patternset for widget HTML files (from ${TARGET_DIR_W}) -->
+        <patternset id="html.widgetfiles">
+            <include name="**/*.html"/>
+        </patternset>
+
+        <!-- Set property for combined widget CSS file -->
+        <property name="CSSPATH" value="/css/sakai/" />
+        <property name="CSSCOMMONWIDGETFILE" value="sakai.widgets.css" />
+
         <path id="hashfiles.jar.id">
             <fileset dir="${HASHTOOL_DIR}/target">
                 <include name="*.jar"/>
@@ -65,6 +79,29 @@
 
         <property name="HASHTOOL_JAR" refid="hashfiles.jar.id"/>
         <echo message="Using this jar for hashing files: ${HASHTOOL_JAR}"/>
+
+    </target>
+
+    <!-- Target: Concatenate widget CSS files and update HTML references -->
+    <target name="concatenate_widget_css" description="Concatenating widget CSS files">
+
+        <!-- Concatenate widget CSS files -->
+        <echo message="Concatenating widget CSS files..." />
+        <concat destfile="${TARGET_DIR}${CSSPATH}${CSSCOMMONWIDGETFILE}">
+            <fileset dir="${TARGET_DIR_W}">
+                <patternset refid="css.widgetfiles"/>
+            </fileset>
+        </concat>
+
+        <echo message="Updating CSS References in widget HTML files..." />
+
+        <!-- Insert Core Javascript reference for the HTML files to the combined Javascript file -->
+        <!--<replaceregexp match="(.*)/devwidgets/(.*).css(.*)" replace="\1${CSSPATH}${CSSCOMMONWIDGETFILE}\3">-->
+        <replaceregexp match="(.*)/devwidgets/(.*).css(.*)" replace="">
+            <fileset dir="${TARGET_DIR_W}">
+                <patternset refid="html.widgetfiles"/>
+            </fileset>
+        </replaceregexp>
 
     </target>
 
@@ -271,7 +308,7 @@
     </target>
 
     <!-- Target: Release Builds-->
-    <target name="release" depends="init, create_target_folders, copy_optimized, permissions, formatting, unpackMathFonts, optimize, hash_files">
+    <target name="release" depends="init, create_target_folders, copy_optimized, permissions, formatting, unpackMathFonts, concatenate_widget_css, optimize, hash_files">
         <echo message="Sakai 3 UX Build: Build complete." />
     </target>
 
