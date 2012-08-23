@@ -395,7 +395,7 @@ require(['jquery', 'underscore', 'sakai/sakai.api.core', 'jquery-ui'], function(
             $.each(items, function(idx, item) {
                 idx = ''+idx;
                 // if it is a valid property to order
-                if (idx.substring(0,1) !== '_' && item.hasOwnProperty('_order')) {
+                if (idx.substring(0,1) !== '_' && item.hasOwnProperty('_order') && idx !== 'main') {
                     // and it is the lowest in the list and we haven't already ordered it
                     if ((lowest === false || item._order < lowest) && $.inArray(idx, alreadyAdded) === -1) {
                         lowest = item._order;
@@ -413,8 +413,8 @@ require(['jquery', 'underscore', 'sakai/sakai.api.core', 'jquery-ui'], function(
             if (items) {
                 $.each(items, function(idx, item) {
                     var toAdd = getLowestOrderItem(items, alreadyAdded);
-                    var itemToAdd = toAdd[1], itemID = toAdd[0];
                     if (toAdd) {
+                        var itemToAdd = toAdd[1], itemID = toAdd[0];
                         itemToAdd._order = order;
                         order++;
                         itemToAdd._id = itemID;
@@ -511,7 +511,19 @@ require(['jquery', 'underscore', 'sakai/sakai.api.core', 'jquery-ui'], function(
             var structureFoundIn = false;
             if (selected.indexOf('/') !== -1) {
                 var splitted = selected.split('/');
-                if (structure.items[splitted[0]] && structure.items[splitted[0]][splitted[1]]) {
+                var selectedDoc = structure.items;
+                var found = false;
+
+                $.each(splitted, function(k, v) {
+                    if (selectedDoc[v]) {
+                        selectedDoc = selectedDoc[v];
+                        found = true;
+                    } else {
+                        found = false;
+                    }
+                });
+
+                if (found) {
                     structureFoundIn = structure;
                 }
             } else {
@@ -855,6 +867,13 @@ require(['jquery', 'underscore', 'sakai/sakai.api.core', 'jquery-ui'], function(
 
                     var fullRef = currentPageShown.pageSavePath.split('/p/')[1] + '-' + newpageid;
                     var basePath = currentPageShown.path.split('/')[0];
+                    var subLevel = currentPageShown.path.split('/').length;
+                    var subPath = currentPageShown.path.split('/');
+
+                    var pageToCreate1ref = newpageid;
+                    if (subLevel > 1) {
+                        pageToCreate1ref = fullRef;
+                    }
 
                     var pageContent = {
                         'rows': [{
@@ -884,14 +903,14 @@ require(['jquery', 'underscore', 'sakai/sakai.api.core', 'jquery-ui'], function(
                         '_childCount':1
                     };
                     var pageToCreate1 = {
-                        '_ref': newpageid,
+                        '_ref': pageToCreate1ref,
                         '_title': 'Untitled Page',
                         '_order': neworder,
                         '_canSubedit': true,
                         '_canEdit': true,
                         '_poolpath': currentPageShown.pageSavePath,
                         'main': {
-                            '_ref': newpageid,
+                            '_ref': pageToCreate1ref,
                             '_order': 0,
                             '_title': 'Untitled Page',
                             '_childCount': 0,
@@ -902,13 +921,32 @@ require(['jquery', 'underscore', 'sakai/sakai.api.core', 'jquery-ui'], function(
                         '_childCount':1
                     };
 
+                    var urlPath = newpageid;
+
+                    if (subLevel > 1) {
+                        subPath.splice(0, 1);
+                        var pageStruct = pubstructure.items[basePath];
+                        var inDocStructure = sakaiDocsInStructure[currentPageShown.pageSavePath].structure0;
+
+                        // search to where the page belongs
+                        $.each(subPath, function(k, v) {
+                            pageStruct = pageStruct[v];
+                            pageStruct._childCount++;
+                            inDocStructure = inDocStructure[v];
+                        });
+
+                        pageStruct[newpageid] = pageToCreate;
+                        inDocStructure[newpageid] = pageToCreate1;
+
+                        urlPath = subPath.join('/') + '/' + urlPath;
+                    } else {
+                        pubstructure.items[basePath][newpageid] = pageToCreate;
+                        pubstructure.items[basePath]._childCount++;
+                        sakaiDocsInStructure[currentPageShown.pageSavePath].structure0[newpageid] = pageToCreate1;
+                    }
+
                     pubstructure.pages[fullRef] = pageContent;
                     sakaiDocsInStructure[currentPageShown.pageSavePath][newpageid] = pageContent;
-
-                    pubstructure.items[basePath][newpageid] = pageToCreate;
-                    pubstructure.items[basePath]._childCount++;
-
-                    sakaiDocsInStructure[currentPageShown.pageSavePath].structure0[newpageid] = pageToCreate1;
                     sakaiDocsInStructure[currentPageShown.pageSavePath].orderedItems = orderItems(sakaiDocsInStructure[currentPageShown.pageSavePath].structure0);
 
                     renderData();
@@ -917,8 +955,7 @@ require(['jquery', 'underscore', 'sakai/sakai.api.core', 'jquery-ui'], function(
                     sakai.api.Server.saveJSON(currentPageShown.pageSavePath + '/' + newpageid + '/', pageContent, function() {
                         $(window).trigger('sakai.contentauthoring.needsTwoColumns');
                         $.bbq.pushState({
-                            'l': currentPageShown.path.split('/')[0] +
-                                    '/' + newpageid,
+                            'l': basePath + '/' + urlPath,
                             'newPageMode': 'true'
                         }, 0);
                         enableSorting();
@@ -934,8 +971,8 @@ require(['jquery', 'underscore', 'sakai/sakai.api.core', 'jquery-ui'], function(
         var changingPageTitle = false;
 
         var checkSaveEditPageTitle = function(ev) {
-            $(document).off('click', checkSaveEditPageTitle);
             if (!$(ev.target).is('input') && changingPageTitle) {
+                $(document).off('click', checkSaveEditPageTitle);
                 savePageTitle();
             }
         };
@@ -970,20 +1007,28 @@ require(['jquery', 'underscore', 'sakai/sakai.api.core', 'jquery-ui'], function(
             pageTitle.show();
 
             currentPageShown.title = $.trim(pageTitle.text());
-            // Change main structure
+            // Change main structure and look up appropriate doc and change that structure
+            var structure = sakaiDocsInStructure[changingPageTitle.savePath];
             var mainPath = changingPageTitle.path;
             if (changingPageTitle.path.toString().indexOf('/') !== -1) {
                 var parts = changingPageTitle.path.toString().split('/');
-                mainPath = parts[1];
-                pubstructure.items[parts[0]][parts[1]]._title = inputArea.val();
+                var pageStruct = pubstructure.items[parts[0]];
+                parts.splice(0, 1);
+                var inDocStructure = structure.structure0;
+
+                // search to where the page is
+                $.each(parts, function(k, v) {
+                    pageStruct = pageStruct[v];
+                    inDocStructure = inDocStructure[v];
+                });
+
+                pageStruct._title = inputArea.val();
+                inDocStructure._title = inputArea.val();
             } else {
                 pubstructure.items[changingPageTitle.path]._title = inputArea.val();
+                structure.structure0[mainPath]._title = inputArea.val();
             }
-            // Look up appropriate doc and change that structure
-            var structure = sakaiDocsInStructure[changingPageTitle.savePath];
-            structure.structure0[mainPath]._title = inputArea.val();
             storeStructure(structure.structure0, changingPageTitle.savePath);
-
             changingPageTitle = false;
         };
 
@@ -1192,8 +1237,8 @@ require(['jquery', 'underscore', 'sakai/sakai.api.core', 'jquery-ui'], function(
             var savePath = $target.data('sakai-savepath');
             var structure = sakaiDocsInStructure[savePath];
             var $list = $target.parents('ul div.lhnavigation_menu_list');
-            if ($target.parents('ul.lhnavigation_subnav').length) {
-                $list = $target.parents('ul.lhnavigation_subnav');
+            if ($target.parent('ul.lhnavigation_subnav').length) {
+                $list = $target.parent('ul.lhnavigation_subnav');
             }
             var area = privstructure;
             if ($list.data('sakai-space') === 'public') {
@@ -1210,10 +1255,22 @@ require(['jquery', 'underscore', 'sakai/sakai.api.core', 'jquery-ui'], function(
                         structure.structure0[struct0path]._order = i;
                     }
                 } else {
+                    var pageStruct = structure.structure0;
+
                     if (struct0path.indexOf('/') > -1) {
-                        struct0path = struct0path.split('/')[1];
+                        struct0path = struct0path.split('/');
+                        struct0path.splice(0, 1);
+
+                        // find the page structure to update
+                        $.each(struct0path, function(k, v) {
+                            if (pageStruct[v]) {
+                                pageStruct = pageStruct[v];
+                            }
+                        });
+                        pageStruct._order = i;
+                    } else {
+                        structure.structure0[struct0path]._order = i;
                     }
-                    structure.structure0[struct0path]._order = i;
                 }
                 var item = getPage(path, area.items);
                 item._order = i;
